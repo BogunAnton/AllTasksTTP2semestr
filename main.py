@@ -18,3 +18,4 @@ def calculate(numbers: Numbers):
 @app.get("/users")
 def get_user():
     return user
+
