@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="50b2c66f-df89-4cd3-8105-0d2ca9ead4e4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../Маршруты_и_структура/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Маршруты_и_структура/models.py" afterDir="false" />
-    </list>
+    <list default="true" id="50b2c66f-df89-4cd3-8105-0d2ca9ead4e4" name="Changes" comment="3_Задание" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -65,6 +62,19 @@
       <option name="presentableId" value="Default" />
       <updated>1740031871341</updated>
     </task>
+    <task id="LOCAL-00001" summary="3_Задание">
+      <option name="closed" value="true" />
+      <created>1740041398487</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1740041398487</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="3_Задание" />
+    <option name="LAST_COMMIT_MESSAGE" value="3_Задание" />
   </component>
 </project>
