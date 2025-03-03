@@ -1,32 +1,18 @@
-# 4 задание
-from fastapi import FastAPI
-from models import User
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, EmailStr, Field
 
 app = FastAPI()
 
-@app.post("/user")
-async def check_adult(user: User):
-    is_adult = user.age >= 18
-    return {
-        "name": user.name,
-        "age": user.age,
-        "is_adult": is_adult
-    }
+class UserCreate(BaseModel):
+    name: str = Field(..., min_length=1)
+    email: EmailStr
+    age: int = Field(None, ge=0)
+    is_subscribed: bool = False
 
-# 5 задание
-# from fastapi import FastAPI
-# from models import Feedback
-#
-# app = FastAPI()
-#
-# # Список для хранения отзывов
-# feedback_list = []
-#
-# @app.post("/feedback")
-# async def submit_feedback(feedback: Feedback):
-#     # Сохраняем отзыв в списке
-#     feedback_list.append(feedback)
-#
-#     # Возвращаем сообщение об успешном завершении
-#     return {
-#         "message": f"Feedback received. Thank you, {feedback.name}!"
+@app.post("/create_user")
+async def create_user(user: UserCreate):
+    return user
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
