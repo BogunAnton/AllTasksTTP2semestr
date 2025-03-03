@@ -1,34 +1,50 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, EmailStr, Field
+
+from fastapi import FastAPI, Form, Request, HTTPException, Depends
+from fastapi.responses import JSONResponse
+from starlette.status import HTTP_401_UNAUTHORIZED
 from typing import Optional
+import uuid
 
 app = FastAPI()
 
-sample_products = [
-    {"product_id": 123, "name": "Smartphone", "category": "Electronics", "price": 599.99},
-    {"product_id": 456, "name": "Phone Case", "category": "Accessories", "price": 19.99},
-    {"product_id": 789, "name": "Iphone", "category": "Electronics", "price": 1299.99},
-    {"product_id": 101, "name": "Headphones", "category": "Accessories", "price": 99.99},
-    {"product_id": 202, "name": "Smartwatch", "category": "Electronics", "price": 299.99}
-]
+# Примерные учетные данные (в реальном приложении используйте базу данных)
+fake_users_db = {
+    "user123": "password123"
+}
 
-@app.get("/product/{product_id}")
-async def get_product(product_id: int):
-    for product in sample_products:
-        if product["product_id"] == product_id:
-            return product
-    raise HTTPException(status_code=404, detail="Product not found")
+# Примерные данные сессий (в реальном приложении используйте базу данных)
+fake_sessions_db = {}
 
-@app.get("/products/search")
-async def search_products(keyword: str, category: Optional[str] = None, limit: Optional[int] = 10):
-    results = [
-        product for product in sample_products
-        if keyword.lower() in product["name"].lower() and
-        (category is None or product["category"].lower() == category.lower())
-    ]
+# Маршрут для входа в систему
+@app.post("/login")
+async def login(username: str = Form(...), password: str = Form(...)):
+    if fake_users_db.get(username) == password:
+        session_token = str(uuid.uuid4())
+        fake_sessions_db[session_token] = username
+        response = JSONResponse(content={"message": "Logged in successfully"})
+        response.set_cookie(
+            key="session_token",
+            value=session_token,
+            httponly=True,
+            secure=True  # Включите это в продакшене, если используете HTTPS
+        )
+        return response
+    else:
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    return results[:limit]
+# Зависимость для проверки аутентификации
+async def verify_token(request: Request):
+    session_token = request.cookies.get("session_token")
+    if not session_token or session_token not in fake_sessions_db:
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+    return fake_sessions_db[session_token]
 
+# Защищенный маршрут для получения информации о пользователе
+@app.get("/user")
+async def get_user(username: str = Depends(verify_token)):
+    return JSONResponse(content={"message": f"Hello, {username}!"})
+
+# Запуск приложения с помощью Uvicorn
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
