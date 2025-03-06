@@ -1,50 +1,26 @@
-
-from fastapi import FastAPI, Form, Request, HTTPException, Depends
-from fastapi.responses import JSONResponse
-from starlette.status import HTTP_401_UNAUTHORIZED
-from typing import Optional
-import uuid
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 app = FastAPI()
+security = HTTPBasic()
 
-# Примерные учетные данные (в реальном приложении используйте базу данных)
-fake_users_db = {
-    "user123": "password123"
-}
+expected_username = "user"
+expected_password = "password"
 
-# Примерные данные сессий (в реальном приложении используйте базу данных)
-fake_sessions_db = {}
-
-# Маршрут для входа в систему
-@app.post("/login")
-async def login(username: str = Form(...), password: str = Form(...)):
-    if fake_users_db.get(username) == password:
-        session_token = str(uuid.uuid4())
-        fake_sessions_db[session_token] = username
-        response = JSONResponse(content={"message": "Logged in successfully"})
-        response.set_cookie(
-            key="session_token",
-            value=session_token,
-            httponly=True,
-            secure=True  # Включите это в продакшене, если используете HTTPS
+def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = credentials.username == expected_username
+    correct_password = credentials.password == expected_password
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
         )
-        return response
-    else:
-        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-# Зависимость для проверки аутентификации
-async def verify_token(request: Request):
-    session_token = request.cookies.get("session_token")
-    if not session_token or session_token not in fake_sessions_db:
-        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized")
-    return fake_sessions_db[session_token]
+@app.get("/login")
+async def login(credentials: HTTPBasicCredentials = Depends(verify_credentials)):
+    return "You got my secret, welcome"
 
-# Защищенный маршрут для получения информации о пользователе
-@app.get("/user")
-async def get_user(username: str = Depends(verify_token)):
-    return JSONResponse(content={"message": f"Hello, {username}!"})
-
-# Запуск приложения с помощью Uvicorn
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
