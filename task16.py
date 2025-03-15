@@ -54,3 +54,4 @@ async def trigger_exception_b(item_id: int):
     if item_id not in [1, 2, 3]:  # Предположим, что допустимые ID - 1, 2, 3
         raise CustomExceptionB(detail=f"Item with ID {item_id} not found, triggering CustomExceptionB.")
     return {"message": "CustomExceptionB not triggered", "item_id": item_id}
+# :)
