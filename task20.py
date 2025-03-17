@@ -37,3 +37,4 @@ database = {}
 async def save_data(data: DataModel):
     database[data.key] = data.value
     return {"message": "Data saved successfully.", "key": data.key}
+# :)

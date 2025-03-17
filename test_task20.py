@@ -22,6 +22,4 @@ def test_save_data():
     response = client.post("/data/", json={"key": "test_key", "value": "test_value"})
     assert response.status_code == 200
     assert response.json() == {"message": "Data saved successfully.", "key": "test_key"}
-
-
-
+# :)
